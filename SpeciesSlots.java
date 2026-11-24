@@ -24,9 +24,12 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import speciesslots.SpeciesSlots.SlotToken;
 
 public class SpeciesSlots extends Application {
 	SimpleIntegerProperty score = new SimpleIntegerProperty(0);
+	AtomicInteger coins = new AtomicInteger(5);
+
 	@Override
 	public void start(Stage stg) throws Exception {
 		Pane tb = new Pane();
@@ -56,6 +59,9 @@ public class SpeciesSlots extends Application {
 			tb.getChildren().add(scoreLabel);
 			
 		draw.setOnAction(ev->{
+			if(coins.get()>0){
+				int oldc =coins.get();
+				coins.set(oldc-1);
 			List<String> slotsvalue = new ArrayList();
 			slotsvalue.clear();
 
@@ -73,13 +79,14 @@ public class SpeciesSlots extends Application {
 				slotlinesBox.getChildren().add(p);
 				
 			}
-			
+			AtomicInteger newscore = new AtomicInteger(0);
 			for(int i = 0; i<slotsvalue.size()-2;i++) {
 				System.out.println(slotsvalue.get(i)+slotsvalue.get(i+1));
-				if(slotsvalue.get(i).contains(slotsvalue.get(i+1))) {int s=score.get();score.set(s+1);
+				if(slotsvalue.get(i).contains(slotsvalue.get(i+1))) {int s=score.get();score.set(s+1);newscore.incrementAndGet();
 				Platform.runLater(()->{ System.out.println("Changed score to "+score);int nscore = score.get();scoreLabel.setText(nscore+" points");});}
 			}
-			System.out.println("Finished draw process");
+			if(newscore.get()==3);
+		}
 		});
 		Pane thing = draw("deer");
 		thing.setLayoutX(250);thing.setLayoutY(150);
@@ -130,7 +137,7 @@ public class SpeciesSlots extends Application {
 		}
 		case("deer")->{
 			Polygon ply = new Polygon();
-			int [] xpts= {2,3,5,7,8,9,11,13,14},ypts= {2,7,9,28,29,30,29,28,9,7,2};
+			int [] xpts= {2,3,5,7,8,9,11,13,14,13,11,8,6},ypts= {2,17,19,48,49,48,19,17,2,10,12,10,8,10};
 			for(int i =0; i<xpts.length;i++) {
 				ply.getPoints().addAll((double)xpts[i],(double)ypts[i]);
 			}
@@ -149,7 +156,48 @@ public class SpeciesSlots extends Application {
 				e.setShape(ball);
 				p.getChildren().add(e);
 			}
-			
+			Pane mouth = new Pane();
+			double mw=22.0, mh =4.0;
+			mouth.setPrefSize(mw,mh);
+			Rectangle mr = new Rectangle(mh,mw);
+			mouth.setShape(mr);
+			mouth.setStyle(eyes[0].getStyle());
+			mouth.setLayoutX(eyes[0].getLayoutX()+1.0);
+			mouth.setLayoutY(eyes[0].getLayoutY()+12.0);
+			p.getChildren().add(mouth);
+
+		}
+		case("wolf")->{
+			Polygon ply = new Polygon();
+			int [] xpts= {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,13,11,8,6,4,2,0},ypts= {0,7,8,9,25,35,36,38,36,35,25,9,8,7,0,-2,5,7,9,7,5,-2};
+			for(int i =0; i<xpts.length;i++) {
+				ply.getPoints().addAll((double)xpts[i],(double)ypts[i]+Math.abs(findMin(ypts)));
+			}
+			int w=findMax(xpts), h=findMax(ypts);
+			p.setPrefSize(w, h);
+			p.setStyle("-fx-background-color: radial-gradient(center 50% 50%, radius 82%, #000000, #646464);");
+			p.setShape(ply);
+			Pane [] eyes = {new Pane(),new Pane()};
+			for(int i =0; i<eyes.length;i++) {
+				Pane e = eyes[i];
+				e.setStyle("-fx-background-color: radial-gradient(center 50% 50%, radius 82%, #000000, #666666);");
+				e.setLayoutX(7+i*5);
+				e.setLayoutY(10);
+				Circle ball = new Circle(5);
+				e.setPrefSize(ball.getRadius(), ball.getRadius());
+				e.setShape(ball);
+				p.getChildren().add(e);
+			}
+			Pane mouth = new Pane();
+			double mw=22.0, mh =4.0;
+			mouth.setPrefSize(mw,mh);
+			Rectangle mr = new Rectangle(mh,mw);
+			mouth.setShape(mr);
+			mouth.setStyle(eyes[0].getStyle());
+			mouth.setLayoutX(eyes[0].getLayoutX()+1.0);
+			mouth.setLayoutY(eyes[0].getLayoutY()+12.0);
+			p.getChildren().add(mouth);
+
 		}
 		default->{}
 		}
